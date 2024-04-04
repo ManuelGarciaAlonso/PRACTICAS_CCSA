@@ -31,10 +31,10 @@ Los servicios implementados y configurados en la práctica son:
 
 (Para cada servicio, se debe incluir una explicación detallada de las configuraciones y el archivo `docker-compose.yml` utilizado en la práctica, así como cualquier otro archivo de configuración relevante.)
 
-###Configuración Específica
+### Configuración Específica
 
 #### HAProxy
-El servicio `haproxy` se configura para actuar como un balanceador de carga y un proxy inverso. Escucha en los puertos 80 y 8404 y redirecciona el tráfico hacia el servicio `ocserver`, que es el servidor de ownCloud.
+El servicio `haproxy` para balancear la carga escucha en los puertos 80 y 8404 y redirecciona el tráfico hacia el servicio `ocserver`, que es el servidor de ownCloud.
 
 - **Imagen**: Se utiliza `haproxytech/haproxy-alpine` para un balanceo de carga eficiente y ligero.
 - **Red**: Conectado a la red `mynet`.
@@ -42,7 +42,7 @@ El servicio `haproxy` se configura para actuar como un balanceador de carga y un
 - **Dependencias**: Depende del servicio `ocserver` para el funcionamiento.
 
 #### ownCloud Server
-El `ocserver` es una instancia del servicio ownCloud que proporciona la interfaz web y el acceso a los archivos.
+El `ocserver` es el servicio ownCloud, para la interfaz web y el acceso a los archivos.
 
 - **Imagen**: Se usa la versión especificada por la variable `${OWNCLOUD_VERSION}` de ownCloud.
 - **Red**: Conectado a la red `mynet`.
@@ -52,7 +52,7 @@ El `ocserver` es una instancia del servicio ownCloud que proporciona la interfaz
 - **Replicación**: Se configura para tener 2 réplicas para alta disponibilidad.
 
 #### MariaDB (Maestro y Esclavo)
-Se configuran dos servicios `mariadb_master` y `mariadb_slave` para la replicación de la base de datos, lo que asegura la continuidad del servicio y la persistencia de los datos.
+Se configuran `mariadb_master` y `mariadb_slave` para la persistencia de los datos.
 
 - **Imagen**: Ambos usan la imagen `mariadb`.
 - **Red**: Conectados a la red `mynet`.
@@ -61,7 +61,7 @@ Se configuran dos servicios `mariadb_master` y `mariadb_slave` para la replicaci
 - **Comandos**: Se especifican opciones de arranque para la replicación y el tamaño de paquetes.
 
 #### Redis
-`redis` se utiliza como almacenamiento en caché para mejorar el rendimiento del servicio ownCloud.
+`redis` se utiliza como caché para mejorar el rendimiento del servicio ownCloud.
 
 - **Imagen**: Se usa la imagen `redis`.
 - **Red**: Conectado a la red `mynet`.
@@ -98,12 +98,21 @@ Para desplegar los servicios de la práctica, se debe ejecutar únicameente el s
 ```bash
 docker-compose up -d
 ```
-Esto es gracias al archivo de configuración [docker-compose.yml](./docker-compose.yml) que ya lo tiene todo listo para arrancar. Debemos asegurarnos de estar en el directorio correcto y de tener Docker Desktop corriendo
-[]()
-[]()
 
-Una vez hemos ejecutado el comando satistfactoriament podemos ver que los servicios están corriendo. Sin embargo, si comprobamos el estado de la replicación del servidor vemos que la base de datos esclava no está copiando a la maestra.
-[Captura2]()
+
+
+Esto es gracias al archivo de configuración [docker-compose.yml](./docker-compose.yml) que ya lo tiene todo listo para arrancar. Debemos asegurarnos de estar en el directorio correcto y de tener Docker Desktop corriendo:
+
+
+
+![Terminal de despliegue de servicios](./img/cap1.png)
+![Docker desktop corriendo los servicios](./img/cap4.png)
+
+Una vez hemos ejecutado el comando satistfactoriamente podemos ver que los servicios están corriendo. Sin embargo, si comprobamos el estado de la replicación del servidor vemos que la base de datos esclava no está copiando a la maestra:
+
+
+
+![BBDD esclava no conectada a master](./img/cap2.png)
 
 Para arreglar este problema debemos hacer una serie de modificaciones:
 1. Archivo de configuración del maestro ([50-server_master.cnf](./50-server_master.cnf))
@@ -135,20 +144,20 @@ docker-compose down -v
 docker system prune
 ```
 
+Hechos los cambios necesarios, podemos ver que la base de datos esclava contiene ahora las tablas que debian ser copiadas desde la base de datos maestra:
+
+
+
+![BBDD esclava conectada a master](./img/cap3.png)
+
 ## Conclusiones
-Después de sumergirme en la práctica de montar un servicio de ownCloud con la magia de Docker y Docker Compose, he aprendido un par de cosas fundamentales que podrían ser útiles para cualquiera que se embarque en esta aventura. Aquí van algunas reflexiones finales:
+Estas son algunas reflexiones finales:
 
-- La importancia de la persistencia de datos: Al principio no era consciente de la necesidad de la persistencia de datos en los servicios de bases de datos como MariaDB. Hacer que la información sobreviva más allá del ciclo de vida de un contenedor es clave. Añadir la variable - MYSQL_DATABASE=owncloud en mariadb_slave fue un cambio pequeño pero crucial para asegurar la visibilidad de la base de datos.
+- Importancia de la persistencia de datos: Al principio no era consciente de la importancia de la persistencia de datos en los servicios de bases de datos como MariaDB, pero hacer que la información se mantenga una vez eliminado contenedor es algo realmente util. En este sentido incluir la variable - MYSQL_DATABASE=owncloud en mariadb_slave fue un cambio pequeño pero determinante para que se viese la base de datos.
 
-- Si algo falla, vuelve al principio: Los comandos docker down y docker prune se convirtieron en mis mejores amigos. Hacer una limpieza y empezar de nuevo me ayudó a resolver problemas que parecían complicados, pero que eran el resultado de configuraciones pasadas conflictivas. Estos comandos fueron como un botón de reinicio que me permitió probar nuevas configuraciones desde un estado limpio.
+- Limpieza del entorno: Los comandos docker down y docker prune sonm fundamentales, ya que había problemas que parecían complicados, pero que eran por probelmas de configuraciones pasadas. 
 
-- El diablo está en los detalles de la configuración: Un cambio aparentemente insignificante en los archivos de configuración puede tener un gran impacto. Ajustar las configuraciones de master y slave para la replicación en 50-server_master.cnf y 50-server_slave.cnf, y luego reflejar esos cambios en docker-compose.yml, fue fundamental para lograr la replicación efectiva y la alta disponibilidad.
+- A veces, una solución no requiere de rehacer todo desde cero, sino de pequeños cambios. En mi caso, al ajustar los parámetros de log-bin y binlog_do_db pude completar el proceso de replicación y rendimiento de la base de datos.
 
-- Identificación única y seguimiento: Asegurarse de que cada instancia de MariaDB tuviera su propio server-id y configurar adecuadamente el binlog fue una lección en ajustes finos. Eso demostró ser vital para la sincronización y el seguimiento efectivo de las operaciones entre la base de datos principal y la de respaldo.
-
-- Los cambios pequeños pueden solucionar grandes problemas: A veces, una solución no requiere de rehacer todo desde cero, sino de pequeñas modificaciones. Ajustar los parámetros de log-bin y binlog_do_db fue todo lo que se necesitó para optimizar el proceso de replicación y rendimiento de la base de datos.
-
-- Documentación y comunidad son salvavidas: No puedo enfatizar lo suficiente cuánto me apoyé en la documentación oficial y en la comunidad. Cada vez que me quedé atascado, había un foro o una guía que señalaba en la dirección correcta.
-
-- En resumen, este proyecto fue un desafío pero increíblemente gratificante. Ha sido una prueba de que con las herramientas correctas y una comunidad de apoyo, incluso las tareas más intimidantes se pueden manejar de forma eficiente y efectiva. La nube de ownCloud que monté no es solo un espacio para archivos, sino un testimonio del aprendizaje continuo y de la capacidad de adaptación en el campo siempre cambiante de la tecnología.
+- Documentación y comunidad: La documentación oficial y de la comunidad es muy util para resolver los problemas más frecuentes que en muchos casos están ya detallados en estos lugares. Cada vez que me quedé atascado, había un foro o una guía que señalaba en la dirección correcta.
 
