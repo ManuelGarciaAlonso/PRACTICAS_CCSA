@@ -161,3 +161,11 @@ Estas son algunas reflexiones finales:
 
 - Documentación y comunidad: La documentación oficial y de la comunidad es muy util para resolver los problemas más frecuentes que en muchos casos están ya detallados en estos lugares. Cada vez que me quedé atascado, había entradas a foros o documentación al respecto para poder continuar con la práctica.
 
+## Bibliografía
+
+1. [https://github.com/ccano/cc2223/tree/main/practice1](https://github.com/ccano/cc2223/tree/main/practice1)
+2. [https://github.com/pnovoa/ccsa_practices/tree/main/practica1escenario2](https://github.com/pnovoa/ccsa_practices/tree/main/practica1escenario2)
+3. [https://www.openldap.org/doc/admin26/quickstart.html](https://www.openldap.org/doc/admin26/quickstart.html)
+4. [https://computingforgeeks.com/run-openldap-server-in-docker-containers/#google_vignette](https://computingforgeeks.com/run-openldap-server-in-docker-containers/#google_vignette)
+5. [https://github.com/osixia/docker-openldap](https://github.com/osixia/docker-openldap)
+6. [https://docs.haproxy.org/2.6/intro.html](https://docs.haproxy.org/2.6/intro.html)
