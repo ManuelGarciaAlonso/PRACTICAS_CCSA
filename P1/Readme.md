@@ -159,5 +159,5 @@ Estas son algunas reflexiones finales:
 
 - A veces, una solución no requiere de rehacer todo desde cero, sino de pequeños cambios. En mi caso, al ajustar los parámetros de log-bin y binlog_do_db pude completar el proceso de replicación y rendimiento de la base de datos.
 
-- Documentación y comunidad: La documentación oficial y de la comunidad es muy util para resolver los problemas más frecuentes que en muchos casos están ya detallados en estos lugares. Cada vez que me quedé atascado, había un foro o una guía que señalaba en la dirección correcta.
+- Documentación y comunidad: La documentación oficial y de la comunidad es muy util para resolver los problemas más frecuentes que en muchos casos están ya detallados en estos lugares. Cada vez que me quedé atascado, había entradas a foros o documentación al respecto para poder continuar con la práctica.
 
