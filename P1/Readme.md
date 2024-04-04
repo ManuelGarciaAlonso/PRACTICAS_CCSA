@@ -1,7 +1,7 @@
 # Documentación de la Práctica: Despliegue de Servicio ownCloud
 
 ## Entorno de Desarrollo y de Producción
-Para la práctica, ell entorno de desarrollo ha sido el siguiente:
+Para la práctica, el entorno de desarrollo ha sido el siguiente:
 
 - **Sistema Operativo**: Microsoft Windows 11 Pro.
 - **Hardware**:
